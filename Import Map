@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js",
+    "chart.js": "https://cdn.jsdelivr.net/npm/chart.js/dist/chart.esm.js",
+    "vue-chartjs": "https://cdn.jsdelivr.net/npm/vue-chartjs@5/dist/vue-chartjs.esm.js"
+  }
+}
