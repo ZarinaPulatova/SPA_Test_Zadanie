@@ -1,9 +1,7 @@
-npm install axios vue-chartjs chart.js
-
 <template>
   <div>
     <h1>Продажи</h1>
-    
+
     <div>
       <label for="dateFrom">Дата от:</label>
       <input type="date" v-model="dateFrom" />
@@ -33,15 +31,16 @@ npm install axios vue-chartjs chart.js
       </tbody>
     </table>
 
-    <pagination :current-page="currentPage" :total-pages="totalPages" @page-changed="fetchSales" />
+    <pagination :current-page="currentPage" :total-pages="totalPages" @page-changed="onPageChanged" />
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
-import LineChart from './LineChart.vue'; // Предполагается, что у Вас есть компонент для графика
-import Pagination from './Pagination.vue'; // Предполагается, что у Вас есть компонент для пагинации
+
+
+  import { createApp, defineComponent, ref } from 'vue';
+  import { Line } from 'vue-chartjs';
+  import { Chart, registerables } from 'chart.js';
 
 export default {
   components: {
@@ -58,20 +57,24 @@ export default {
 
     const fetchSales = async () => {
       const token = 'YOUR_API_TOKEN'; // Замените на Ваш токен
-      const response = await axios.get(`/api/sales`, {
-        params: {
-          dateFrom: dateFrom.value,
-          dateTo: dateTo.value,
-          page: currentPage.value,
-          limit: 500,
-          key: token,
-        },
-      });
+      try {
+        const response = await axios.get('/api/sales', {
+          params: {
+            dateFrom: dateFrom.value,
+            dateTo: dateTo.value,
+            page: currentPage.value,
+            limit: 500,
+            key: token,
+          },
+        });
 
-      sales.value = response.data.data; // Предполагается, что данные находятся в response.data.data
-      totalPages.value = response.data.meta.total_pages; // Предполагается, что информация о страницах находится здесь
+        sales.value = response.data.data;
+        totalPages.value = response.data.meta.total_pages;
 
-      updateChartData();
+        updateChartData();
+      } catch (error) {
+        console.error('Ошибка при загрузке данных продаж:', error);
+      }
     };
 
     const updateChartData = () => {
@@ -87,6 +90,11 @@ export default {
       ];
     };
 
+    const onPageChanged = (page) => {
+      currentPage.value = page;
+      fetchSales();
+    };
+
     onMounted(fetchSales);
 
     return {
@@ -97,6 +105,9 @@ export default {
       totalPages,
       chartData,
       fetchSales,
+      onPageChanged,
     };
   },
 };
+</script>
+
